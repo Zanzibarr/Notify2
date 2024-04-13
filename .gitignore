@@ -1,3 +1,4 @@
 local/
 __pycache__/
 python_module/__pycache__
+.DS_Store

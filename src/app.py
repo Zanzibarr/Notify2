@@ -216,7 +216,7 @@ def __send(parsed : list[dict]):
         if profile_name != "": 
             with open(CONFIG_PATH, "r") as f:
                 if profile_name not in json.loads(f.read())["profiles"]:
-                    ntf_error(f"Cannot find {profile_name} as a profile in the configuration file.")
+                    ntf_error(f"Cannot find '{profile_name}' as a profile in the configuration file.")
 
         if profile_name != "": bot.load_profile(name=profile_name)
 

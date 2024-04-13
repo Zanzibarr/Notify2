@@ -33,10 +33,10 @@ export PYTHONPATH = '{DEST_PATH}/python_module'
 HELP_START = "\nHi! Thanks for using notify2!\n\nIf this instructions are not helping, please open an issue on github or give a look to the telegram API website (linked at the end of this message).\n\nHere's the """
 HELP_END = f"""
 
-Base folder: {BASE_PATH}
-Profiles file: {CONFIG_PATH}
-Base repository: https://github.com/Zanzibarr/Notify2
-Telegram API explanation: https://core.telegram.org/bots/api
+Base folder: \033[4m{BASE_PATH}\033[0m
+Profiles file: \033[4m{CONFIG_PATH}\033[0m
+Base repository: \033[4mhttps://github.com/Zanzibarr/Notify2\033[0m
+Telegram API explanation: \033[4mhttps://core.telegram.org/bots/api\033[0m
 
 Version: {VERSION}
 """
@@ -176,26 +176,26 @@ PARAMETERS = {
     "audio" : ["-audio", "-a"],
     "document" : ["-document", "-doc", "-d"],
     "video" : ["-video", "-v"],
-    "exception" : ["-exception", "-exc"],
+    "exception" : ["-exception", "-exc", "-e"],
 
-    "token" : ["-token"],
+    "token" : ["-token", "-tok"],
     "to_chat" : ["-to", "-chat"],
-    "mthread" : ["-mt_id"],
-    "pmode" : ["-parse"],
-    "webprev" : ["-no_webp_preview"],
-    "dino" : ["-silent"],
+    "mthread" : ["-mt_id", "-thread_id"],
+    "pmode" : ["-parse", "-mode", "-pmode"],
+    "webprev" : ["-no_webp_preview", "-no_prev"],
+    "dino" : ["-silent", "-s"],
     "protcont" : ["-protect_content"],
     "reply_id" : ["-reply"],
     "reply_anyway" : ["-reply_anyway"],
     "mex_id" : ["-message"],
     "from_chat" : ["-from"],
-    "caption" : ["-caption"],
+    "caption" : ["-caption", "-cap"],
     "spoiler" : ["-spoiler"],
     "duration" : ["-duration"],
-    "performer" : ["-performer"],
+    "performer" : ["-performer", "-author"],
     "title" : ["-title"],
-    "thumbnail" : ["-thumb_path"],
-    "typedetect" : ["-no_ctype_det"],
+    "thumbnail" : ["-thumb_path", "-thumb", "-thumbnail"],
+    "typedetect" : ["-no_ctype_det", "-no_detect"],
     "width" : ["-width"],
     "height" : ["-height"],
     "streaming" : ["-streaming"]
@@ -229,18 +229,18 @@ PARAMS_EXPLANATION = {
 
 EXPLANATION = {
 
-    "help"       : f"""{str(PARAMETERS['help']).replace(',', ' |')} : View notify options.
+    "help"       : f"""\033[1m\033[4m{str(PARAMETERS['help']).replace(',', ' |')}\033[0m : View notify options.
     => If followed by a {ALIAS} option prints the explanation of that parameter.""",
 
-    "version"    : f"{str(PARAMETERS['version']).replace(',', ' |')} : View notify2 version.",
+    "version"    : f"\033[1m\033[4m{str(PARAMETERS['version']).replace(',', ' |')}\033[0m : View notify2 version.",
 
-    "update"     : f"""{str(PARAMETERS['update']).replace(',', ' |')} : Update to latest stable version.
+    "update"     : f"""\033[1m\033[4m{str(PARAMETERS['update']).replace(',', ' |')}\033[0m : Update to latest stable version.
     => If followed by a version (es: {VERSION}) downloads and installs that specific version.
     => If followed by {str(PARAMETERS['dev']).replace(',', ' |')} update to latest non-stable version.""",
 
-    "uninstall"  : f"{str(PARAMETERS['uninstall']).replace(',', ' |')} : Uninstalls notify2.",
+    "uninstall"  : f"\033[1m\033[4m{str(PARAMETERS['uninstall']).replace(',', ' |')}\033[0m : Uninstalls notify2.",
 
-    "config"     : f"""{str(PARAMETERS['config']).replace(',', ' |')} : View the location of the configuration file.
+    "config"     : f"""\033[1m\033[4m{str(PARAMETERS['config']).replace(',', ' |')}\033[0m : View the location of the configuration file.
     => You can add one of these options:
         => {str(PARAMETERS['add']).replace(',', ' |')} <profile_name> {str(PARAMETERS['token']).replace(',', ' |')} <API_bot_token> [<profile_options>]* : Create a new profile in the configuration file with the name <profile_name> and with the API token <API_bot_token>.
         => {str(PARAMETERS['remove']).replace(',', ' |')} <profile_name> : Remove the profile specified from the configuration file.
@@ -257,7 +257,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_anyway']}
         => {PARAMS_EXPLANATION['pmode']}""",
 
-    "profile"    : f"""{str(PARAMETERS['profile']).replace(',', ' |')} [<profile_options>]+ : Used optionally in pair with sending messages to manually choose a profile or specify profile options.
+    "profile"    : f"""\033[1m\033[4m{str(PARAMETERS['profile']).replace(',', ' |')}\033[0m\033[4m [<profile_options>]+\033[0m : Used optionally in pair with sending messages to manually choose a profile or specify profile options.
     => profile_options:
         => profile_name : If specified must be the first option. The profile to use from the configuration file.
         => {PARAMS_EXPLANATION['token']}
@@ -269,7 +269,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_anyway']}
         => {PARAMS_EXPLANATION['pmode']}""",
     
-    "text"       : f"""{str(PARAMETERS['text']).replace(',', ' |')} <text/file> [<text_params>]* : Sends a text message specified by text or path to the file to read.
+    "text"       : f"""\033[1m\033[4m{str(PARAMETERS['text']).replace(',', ' |')}\033[0m\033[4m <text/file> [<text_params>]*\033[0m : Sends a text message specified by text or path to the file to read.
     => text_params:
         => {PARAMS_EXPLANATION['to_chat']}
         => {PARAMS_EXPLANATION['mthread']}
@@ -280,7 +280,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_id']}
         => {PARAMS_EXPLANATION['reply_anyway']}""",
 
-    "photo"      : f"""{str(PARAMETERS['photo']).replace(',', ' |')} <file> [<photo_params>]* : Sends the photo specified by the path.
+    "photo"      : f"""\033[1m\033[4m{str(PARAMETERS['photo']).replace(',', ' |')}\033[0m\033[4m <file> [<photo_params>]*\033[0m : Sends the photo specified by the path.
     => photo_params:
         => {PARAMS_EXPLANATION['to_chat']}
         => {PARAMS_EXPLANATION['mthread']}
@@ -292,7 +292,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_id']}
         => {PARAMS_EXPLANATION['reply_anyway']}""",
 
-    "audio"      : f"""{str(PARAMETERS['audio']).replace(',', ' |')} <file> [<audio_params>]* : Sends the audio specified by the path.
+    "audio"      : f"""\033[1m\033[4m{str(PARAMETERS['audio']).replace(',', ' |')}\033[0m\033[4m <file> [<audio_params>]*\033[0m : Sends the audio specified by the path.
     => audio_params:
         => {PARAMS_EXPLANATION['to_chat']}
         => {PARAMS_EXPLANATION['mthread']}
@@ -307,7 +307,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_id']}
         => {PARAMS_EXPLANATION['reply_anyway']}""",
 
-    "document"   : f"""{str(PARAMETERS['document']).replace(',', ' |')} <file> [<doc_params>]* : Sends the document specified by the path.
+    "document"   : f"""\033[1m\033[4m{str(PARAMETERS['document']).replace(',', ' |')}\033[0m\033[4m <file> [<doc_params>]*\033[0m : Sends the document specified by the path.
     => doc_params:
         => {PARAMS_EXPLANATION['to_chat']}
         => {PARAMS_EXPLANATION['mthread']}
@@ -320,7 +320,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_id']}
         => {PARAMS_EXPLANATION['reply_anyway']}""",
 
-    "video"      : f"""{str(PARAMETERS['video']).replace(',', ' |')} <file> [<video_params>]* : Sends the video specified by the path.
+    "video"      : f"""\033[1m\033[4m{str(PARAMETERS['video']).replace(',', ' |')}\033[0m\033[4m <file> [<video_params>]*\033[0m : Sends the video specified by the path.
     => video_params:
         => {PARAMS_EXPLANATION['to_chat']}
         => {PARAMS_EXPLANATION['mthread']}
@@ -336,7 +336,7 @@ EXPLANATION = {
         => {PARAMS_EXPLANATION['reply_id']}
         => {PARAMS_EXPLANATION['reply_anyway']}""",
 
-    "exception"  : f"""{str(PARAMETERS['exception']).replace(',', ' |')} <text> [<exception_params>]* : Sends an exception with the text specified.
+    "exception"  : f"""\033[1m\033[4m{str(PARAMETERS['exception']).replace(',', ' |')}\033[0m\033[4m <text> [<exception_params>]*\033[0m : Sends an exception with the text specified.
     => exception_params:
         => {PARAMS_EXPLANATION['to_chat']}""",
 
