@@ -60,6 +60,7 @@ CONNECTION_ISSUE = "There might be a connection issue, retry later."
 
 OPEN_ISSUE = "Please open an issue on GitHub about it."
 WRONG_ARGUMENTS = "Wrong arguments."
+CONF_FILE_UNCHANGED = "Configuration file unchanged."
 
 #endregion
 
@@ -75,8 +76,9 @@ ERROR_MSG = "\033[91m\033[1m[ ERROR ]:\033[0m "
 
 def ntf_error(msg : str, loc : str = "", line : int = "", sugg : str = "") -> None:
 
-    [ print(f"{ERROR_MSG}{line}" if line != "" else "") for line in msg.splitlines() ]
-    if loc != "": print(f"{ERROR_MSG}Origin: {loc}:{line}")
+    first_line = msg.partition("\n")[0]
+    [ print(f"{ERROR_MSG}{'=> ' if line != first_line else ''}{line}" if line != "" else "") for line in msg.splitlines() ]
+    if loc != "": print(f"{ERROR_MSG}=> Origin: {loc}:{line}")
     if sugg != "": ntf_info(sugg)
     exit(1)
 
@@ -86,8 +88,9 @@ def ntf_info(msg : str) -> None:
 
 def ntf_warn(msg : str, loc : str = "", line : int = "", sugg : str = ""):
 
-    [ print(f"{WARN_MSG}{line}" if line != "" else "") for line in msg.splitlines() ]
-    if loc != "": print(f"{WARN_MSG}Origin: {loc}:{line}")
+    first_line = msg.partition("\n")[0]
+    [ print(f"{WARN_MSG}{'=> ' if line != first_line else ''}{line}" if line != "" else "") for line in msg.splitlines() ]
+    if loc != "": print(f"{WARN_MSG}=> Origin: {loc}:{line}")
     if sugg != "": ntf_info(sugg)
 
 def ntf_input(msg : str, options : list[str] = []) -> str:
@@ -176,6 +179,13 @@ class arg_parser:
         
         return self.__params
 
+#endregion
+
+
+#---------------------------------------------------------------
+#region                      PARAMETERS                            
+#---------------------------------------------------------------
+
 PARAMETERS = {
 
     "help" : ["-help", "-h", "--help", "--h"],
@@ -255,8 +265,7 @@ EXPLANATION = {
     "version"    : f"\033[1m\033[4m{str(PARAMETERS['version']).replace(',', ' |')}\033[0m : View notify2 version.",
 
     "update"     : f"""\033[1m\033[4m{str(PARAMETERS['update']).replace(',', ' |')}\033[0m : Update to latest stable version.
-    => If followed by a version (es: {VERSION}) downloads and installs that specific version.
-    => If followed by {str(PARAMETERS['dev']).replace(',', ' |')} update to latest non-stable version.""",
+    => If followed by a version (es: {VERSION}) downloads and installs that specific version.""",
 
     "uninstall"  : f"\033[1m\033[4m{str(PARAMETERS['uninstall']).replace(',', ' |')}\033[0m : Uninstalls notify2.",
 

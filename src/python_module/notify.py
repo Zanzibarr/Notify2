@@ -266,8 +266,8 @@ class bot:
 			- "parse_mode" : str (optional) -> Mode for parsing entities in the message text. See the site for more details.'''
 
 		if "token" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing field 'token' in the profile.")
-		if profile["token"]=="": utils.ntf_exc("NOTIFY_EXCEPTION: Missing token in the profile.")
-		if not utils.requests_post(f"https://api.telegram.org/bot{profile['token']}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
+		if profile["token"]=="": utils.ntf_warn("NOTIFY_EXCEPTION: Missing token in the profile.")
+		if not utils.requests_post(f"https://api.telegram.org/bot{profile['token']}/getMe").json()["ok"]: utils.ntf_warn("NOTIFY_EXCEPTION: Invalid token.")
 
 		if "from_chat_id" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing 'from_chat_id' in the profile.")
 		if "to_chat_id" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing 'to_chat_id' in the profile.")
@@ -299,21 +299,21 @@ class bot:
 			configuration = json.loads(f.read())["profiles"]
 
 		if token == "" and name == "":
-			utils.ntf_exc("NOTIFY_EXCEPTION: Either the token or the name of the profile must be specified.") #---/---
+			utils.ntf_warn("NOTIFY_EXCEPTION: Either the token or the name of the profile must be specified.") #---/---
 		
 		elif token == "" and name != "":
 			if name not in configuration:
 				utils.ntf_warn(f"the name {name} of the profile to load isn't associated to any profile.\nNo profile loaded.")
 				return #---/no match
 			if "token" not in configuration[name]:
-				utils.ntf_exc("NOTIFY_EXCEPTION: Configuration file corrupted.")
+				utils.ntf_warn("NOTIFY_EXCEPTION: Configuration file corrupted.")
 			self.set_profile_from_dict(profile=configuration[name]) #---/valid
 			if not utils.requests_post(f"https://api.telegram.org/bot{self.__profile['token']}/getMe").json()["ok"]:
 				utils.ntf_warn(f"the token inside the profile {name} is invalid, profile loaded anyways.\nConsider changing it or specify a new token.") #---/invalid
 
 		elif name == "":
 			if not utils.requests_post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]:
-				utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.") #invalid/---
+				utils.ntf_warn("NOTIFY_EXCEPTION: Invalid token.") #invalid/---
 			self.__profile["token"] = token #valid/---
 		
 		elif name != "":
@@ -321,16 +321,16 @@ class bot:
 			if name not in configuration:
 				utils.ntf_warn(f"the name {name} of the profile to load isn't associated to any profile. Loading only the token specified.")
 				if not valid_token:
-					utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.") #invalid/no match
+					utils.ntf_warn("NOTIFY_EXCEPTION: Invalid token.") #invalid/no match
 				self.__profile["token"] = token #valid/no match
 			else:
 				if "token" not in configuration[name]:
-					utils.ntf_exc("NOTIFY_EXCEPTION: Configuration file corrupted.")
+					utils.ntf_warn("NOTIFY_EXCEPTION: Configuration file corrupted.")
 				self.set_profile_from_dict(profile=configuration[name])
 				valid_profile = utils.requests_post(f"https://api.telegram.org/bot{self.__profile['token']}/getMe").json()["ok"]
 				if not valid_token:
 					if not valid_profile:
-						utils.ntf_exc("NOTIFY_EXCEPTION: Both tokens (the one specified and the one in the profile) are invalid.") #invalid/invalid
+						utils.ntf_warn("NOTIFY_EXCEPTION: Both tokens (the one specified and the one in the profile) are invalid.") #invalid/invalid
 					utils.ntf_warn(f"the token specified is invalid.\nUsing the {name} profile token.") #invalid/valid
 				else:
 					if not valid_profile:

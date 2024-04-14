@@ -14,18 +14,12 @@ def __help(parsed : list[dict]):
     
     if len(parsed) > 2 or len(parsed) == 2 and len(parsed[1]["list"]) > 1:
         ntf_warn("Too many arguments.", sugg=f"Command used: '{ALIAS} {parsed[0]['list'][0]} {parsed[1]['list'][0]}'.")
-        if ntf_input("Proceed anyways?", ["y", "n"]) == "n":
-            ntf_info("Exiting.")
-            exit(0)
 
     elif len(parsed) == 1 and len(parsed[0]["list"]) > 1:
         ntf_error(f"'{' '.join(parsed[0]['list'][1:])}' is not a {ALIAS} option.", sugg=f"Example usage: '{ALIAS} {parsed[0]['list'][0]} {PARAMETERS['text'][0]}' to view text help.")
 
     elif len(parsed) > 1 and len(parsed[0]["list"]) > 1:
         ntf_warn("Too many aruguments.", sugg=f"Command used: '{ALIAS} {parsed[0]['list'][0]} {parsed[1]['list'][0]}'.")
-        if ntf_input("Proceed anyways?", ["y", "n"]) == "n":
-            ntf_info("Exiting.")
-            exit(0)
 
     msg = HELP_START
 
@@ -99,9 +93,8 @@ def __update(parsed : list[dict]):
         exit(0)
 
     ntf_info(f"Downloading version {new_version}.")
-    choice = ntf_input("Proceed?", ["y", "n"])
 
-    if choice == "n":
+    if ntf_input("Proceed?", ["y", "n"]) == "n":
         ntf_warn("notify not updated.", sugg="Exiting.")
         exit(0)
 
@@ -115,11 +108,11 @@ def __update(parsed : list[dict]):
         f.write(downloaded.content)
 
     ntf_info("Installing new version.")
-    subprocess.run(shlex.split(f"unzip {BASE_PATH}/ntfdwntmp/{asked_version} -d {BASE_PATH}/ntfdwntmp/"), stdout=subprocess.DEVNULL)
-    subprocess.run(shlex.split(f"rm {BASE_PATH}/ntfdwntmp/{asked_version}"))
-    subprocess.run(shlex.split(f"{PYTHON_VERSION} {BASE_PATH}/ntfdwntmp/setup.py -u"))
+    subprocess.run(shlex.split(f"unzip {BASE_PATH}/ntfdwntmp/{asked_version} -d {BASE_PATH}/ntfdwntmp/"), stdout=subprocess.DEVNULL, check=True)
+    subprocess.run(shlex.split(f"rm {BASE_PATH}/ntfdwntmp/{asked_version}"), check=True)
+    subprocess.run(shlex.split(f"{PYTHON_VERSION} {BASE_PATH}/ntfdwntmp/setup.py -u"), check=True)
 
-    subprocess.run(shlex.split(f"rm -r {BASE_PATH}/ntfdwntmp"))
+    subprocess.run(shlex.split(f"rm -r {BASE_PATH}/ntfdwntmp"), check=True)
         
     ntf_info("notify2 has been updated")
 
@@ -134,15 +127,13 @@ def __uninstall(parsed : list[dict]):
 
     if len(parsed) > 1 or len(parsed[0]["list"]) > 1:
         ntf_warn("Too many arguments.", sugg=f"Use '{ALIAS} {PARAMETERS['uninstall'][0]}' to uninstall notify.\nCommand used: '{ALIAS} {PARAMETERS['uninstall'][0]}'")
-        
-    choice = ntf_input("Proceeding to uninstall notify?", ["y", "n"])
 
-    if choice == "n":
+    if ntf_input("Proceeding to uninstall notify?", ["y", "n"]) == "n":
         ntf_info("Uninstall aborted.")
         exit(0)
     
     ntf_info("Uninstalling...")
-    subprocess.run(shlex.split(f"rm -r {DEST_PATH}"))
+    subprocess.run(shlex.split(f"rm -r {DEST_PATH}"), check=True)
     
     if os.path.exists(BASHRC_FILE):
         bashrc = ""
@@ -173,12 +164,10 @@ def __config(parsed : list[dict]):
 
     if len(parsed) > 1:
         ntf_warn("Too many arguments.", sugg=f"Command used: '{ALIAS} {' '.join(parsed[0]['list'])}'.")
-        if ntf_input("Proceed anyways?", ["y", "n"]) == "n":
-            ntf_info("Exiting.")
-            exit(0)
 
     if len(parsed[0]["list"]) == 1:
-        ntf_error("Too few arguments.", sugg=f"Use '{ALIAS} {PARAMETERS['help'][0]} {PARAMETERS['config'][0]}' to view config options.")
+        print(CONFIG_PATH)
+        exit(0)
 
     config_parser = arg_parser()
 
@@ -209,7 +198,7 @@ def __config(parsed : list[dict]):
         if config_parsed[alias] in configuration["profiles"]:
             ntf_warn(f"The profile '{config_parsed[alias]}' already exists.")
             if ntf_input(f"Overwrite this profile?", ["y", "n"]) == "n":
-                ntf_info("Configuration file unchanged.")
+                ntf_info(f"{CONF_FILE_UNCHANGED}")
                 exit(0)
 
         notify.write_conf_profile(config_parsed["add"], config_parsed["token"], config_parsed.get("from_chat", ""), config_parsed.get("to_chat", ""), config_parsed.get("webprev", ""), config_parsed.get("dino", ""), config_parsed.get("protcont", ""), config_parsed.get("reply_anyway", ""), config_parsed.get("pmode", ""))
@@ -220,12 +209,12 @@ def __config(parsed : list[dict]):
         
         if config_parsed[alias] not in configuration["profiles"]:
             ntf_warn(f"The profile '{config_parsed[alias]}' doesn't exist.")
-            ntf_info("Configuration file unchanged.")
+            ntf_info(f"{CONF_FILE_UNCHANGED}")
             exit(0)
 
         ntf_warn(f"Removing profile '{config_parsed[alias]}'.")
         if ntf_input("Confirm?", ["y", "n"]) == "n":
-            ntf_info("Configuration file unchanged.")
+            ntf_info(f"{CONF_FILE_UNCHANGED}")
             exit(0)
 
         notify.remove_profile(config_parsed[alias])
@@ -236,15 +225,15 @@ def __config(parsed : list[dict]):
         
         if config_parsed[alias] not in configuration["profiles"]:
             ntf_warn(f"The profile '{config_parsed[alias]}' doesn't exist.")
-            ntf_info("Configuration file unchanged.")
+            ntf_info(f"{CONF_FILE_UNCHANGED}")
             exit(0)
 
         ntf_warn(f"Editing profile '{config_parsed[alias]}'.")
         if ntf_input("Confirm?", ["y", "n"]) == "n":
-            ntf_info("Configuration file unchanged.")
+            ntf_info(f"{CONF_FILE_UNCHANGED}")
             exit(0)
 
-        notify.write_conf_profile(config_parsed["edit"], config_parsed.get("token", ""), config_parsed.get("from_chat", ""), config_parsed.get("to_chat", ""), config_parsed.get("webprev", ""), config_parsed.get("dino", ""), config_parsed.get("protcont", ""), config_parsed.get("reply_anyway", ""), config_parsed.get("pmode", ""))
+        notify.edit_conf_profile(config_parsed["edit"], config_parsed.get("token", ""), config_parsed.get("from_chat", ""), config_parsed.get("to_chat", ""), config_parsed.get("webprev", ""), config_parsed.get("dino", ""), config_parsed.get("protcont", ""), config_parsed.get("reply_anyway", ""), config_parsed.get("pmode", ""))
 
         ntf_info("Profile changed succesfully.")
 
@@ -252,12 +241,12 @@ def __config(parsed : list[dict]):
         
         if config_parsed[alias] not in configuration["profiles"]:
             ntf_warn(f"The profile '{config_parsed[alias]}' doesn't exist.")
-            ntf_info("Configuration file unchanged.")
+            ntf_info(f"{CONF_FILE_UNCHANGED}")
             exit(0)
 
         ntf_warn(f"Setting the profile '{config_parsed[alias]}' as default.")
         if ntf_input("Confirm?", ["y", "n"]) == "n":
-            ntf_info("Configuration file unchanged.")
+            ntf_info(f"{CONF_FILE_UNCHANGED}")
             exit(0)
 
         notify.set_default_profile(config_parsed[alias])
