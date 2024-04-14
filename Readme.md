@@ -37,22 +37,22 @@ PYTHON_VERSION = "/usr/bin/python3" #edit this (roughly at line 20)
 - You may also want to know your telegram chat id so that you can send messages to yourself: follow [this tutorial](https://www.youtube.com/watch?v=UPC5Ck1oU6k) and you will get the following message:
 ```json
 {
-    "update_id": ...,
+    "update_id": "...",
     "message": {
-        "message_id": ...,
+        "message_id": "...",
         "from": {
-            ...
+            "..."
         },
         "chat": {
-            "id": CHAT_ID,
-            "first_name": ...,
-            "username": ...,
-            "type": ...
+            "id": "CHAT_ID",
+            "first_name": "...",
+            "username": "...",
+            "type": "..."
         },
-        "date": ...,
-        "text": ...,
+        "date": "...",
+        "text": "...",
         "entities": [
-            ...
+            "..."
         ]
     }
 }
