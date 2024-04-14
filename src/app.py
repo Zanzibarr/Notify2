@@ -1,6 +1,9 @@
+import sys
+sys.dont_write_bytecode = True
+
 import python_module.notify as notify
 from notify_utils import *
-import sys
+import subprocess, shlex, requests, json
 
 
 #---------------------------------------------------------------
@@ -16,7 +19,7 @@ def __help(parsed : list[dict]):
             exit(0)
 
     elif len(parsed) == 1 and len(parsed[0]["list"]) > 1:
-        ntf_error(f"'{' '.join(parsed[0]["list"][1:])}' is not a {ALIAS} option.", sugg=f"Example usage: '{ALIAS} {parsed[0]['list'][0]} {PARAMETERS['text'][0]}' to view text help.")
+        ntf_error(f"'{' '.join(parsed[0]['list'][1:])}' is not a {ALIAS} option.", sugg=f"Example usage: '{ALIAS} {parsed[0]['list'][0]} {PARAMETERS['text'][0]}' to view text help.")
 
     elif len(parsed) > 1 and len(parsed[0]["list"]) > 1:
         ntf_warn("Too many aruguments.", sugg=f"Command used: '{ALIAS} {parsed[0]['list'][0]} {parsed[1]['list'][0]}'.")
@@ -63,7 +66,54 @@ def __version(parsed : list[dict]):
 #---------------------------------------------------------------
 
 def __update(parsed : list[dict]):
-    print("TODO: UPDATE")
+
+    if len(parsed) > 1 or len(parsed[0]['list']) > 2:
+        ntf_warn("Too many arguments.", sugg=f"Command used: '{ALIAS} {PARAMETERS['update'][0]} {parsed[0]['list'][1] if len(parsed[0]['list']) > 1 else 'latest'}'.")
+    
+    try:
+        ntf_info("Fetching releases.")
+        response = requests.get(f"{RELEASES}/{RELEASES_LIST}")
+    except Exception as e:
+        ntf_error(CONNECTION_ISSUE)
+
+    if not response.ok:
+        ntf_error(f"Status code: '{response.status_code}'.", sugg=OPEN_ISSUE)
+
+    versions = json.loads(response.content.decode('utf-8'))
+    asked_version = parsed[0]["list"][1] if len(parsed[0]["list"]) > 1 else "latest"
+    
+    if asked_version not in versions:
+        ntf_warn(f"Cannot find version '{asked_version}'.", sugg="Here's the list of available versions:")
+        print(json.dumps(list(versions.keys()), indent=2))
+        choices = [ver for ver in versions.keys()]
+        choices.append("-q")
+        asked_version = ntf_input("Which version you want to update to? ('-q' to exit update)", choices)
+
+        if asked_version == "-q":
+            ntf_info("Exiting.")
+            exit(0)
+
+    ntf_info(f"Downloading version {versions[asked_version]['version']}.")
+    choice = ntf_input("Proceed?", ["y", "n"])
+
+    if choice == "n":
+        ntf_warn("notify not updated.", sugg="Exiting.")
+        exit(0)
+
+    asked_version = f"v{versions[asked_version]['version']}.zip"
+
+    if not os.path.exists(f"{BASE_PATH}/ntfdwntmp"):
+        os.mkdir(f"{BASE_PATH}/ntfdwntmp")
+
+    downloaded = requests.get(f"{RELEASES}/{asked_version}", allow_redirects=True)
+    with open(f"{BASE_PATH}/ntfdwntmp/{asked_version}", "wb") as f:
+        f.write(downloaded.content)
+
+    subprocess.run(shlex.split(f"unzip {BASE_PATH}/ntfdwntmp/{asked_version} -d {BASE_PATH}/ntfdwntmp/"), stdout=subprocess.DEVNULL)
+    subprocess.run(shlex.split(f"rm {BASE_PATH}/ntfdwntmp/{asked_version}"))
+    subprocess.run(shlex.split(f"{PYTHON_VERSION} {BASE_PATH}/ntfdwntmp/setup.py -u"))
+        
+    ntf_info("notify2 has been updated")
 
 #endregion
 
@@ -73,7 +123,36 @@ def __update(parsed : list[dict]):
 #---------------------------------------------------------------
 
 def __uninstall(parsed : list[dict]):
-    print("TODO: UNINSTALL")
+
+    if len(parsed) > 1 or len(parsed[0]["list"]) > 1:
+        ntf_warn("Too many arguments.", sugg=f"Use '{ALIAS} {PARAMETERS['uninstall'][0]}' to uninstall notify.\nCommand used: '{ALIAS} {PARAMETERS['uninstall'][0]}'")
+        
+    choice = ntf_input("Proceeding to uninstall notify?", ["y", "n"])
+
+    if choice == "n":
+        ntf_info("Uninstall aborted.")
+        exit(0)
+    
+    ntf_info("Uninstalling...")
+    subprocess.run(shlex.split(f"rm -r {DEST_PATH}"))
+    
+    if os.path.exists(BASHRC_FILE):
+        bashrc = ""
+        with open(BASHRC_FILE, "r") as f:
+            bashrc = f.read()
+        bashrc = bashrc.replace(SHELL_RC_EDIT, "")
+        with open(BASHRC_FILE, "w") as f:
+            f.write(bashrc)
+    
+    if os.path.exists(ZSHRC_FILE):
+        zshrc = ""
+        with open(ZSHRC_FILE, "r") as f:
+            zshrc = f.read()
+        zshrc = zshrc.replace(SHELL_RC_EDIT, "")
+        with open(ZSHRC_FILE, "w") as f:
+            f.write(zshrc)
+    
+    ntf_info("notify has been succesfully uninstalled.\nPlease reload the RC file (bash or zsh).")
 
 #endregion
 

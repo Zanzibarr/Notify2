@@ -1,4 +1,7 @@
-import requests, time, subprocess, os, json, sys
+import sys
+sys.dont_write_bytecode = True
+
+import time, subprocess, os, json
 import numpy as np
 sys.path.append('../')
 import notify_utils as utils
@@ -6,8 +9,6 @@ import notify_utils as utils
 #---------------------------------------------------------------
 #region                  CONFIGURATIONS                        -
 #---------------------------------------------------------------
-
-config_path = f"{os.path.expanduser('~')}/.zanz_notify_profiles"
 
 def write_conf_profile(name, token, from_chat_id="", to_chat_id="", disable_web_page_preview="", disable_notification="", protect_content="", allow_sending_without_reply="", parse_mode=""): 
 
@@ -23,14 +24,14 @@ def write_conf_profile(name, token, from_chat_id="", to_chat_id="", disable_web_
 	- allow_sending_without_reply : bool (optional) -> Pass True if the message should be sent even if the specified replied-to message is not found
 	- parse_mode : str (optional) -> Mode for parsing entities in the message text. See the site for more details.'''
 
-	if token != "" and not requests.post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
+	if token != "" and not utils.requests_post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
 
-	if not os.path.exists(config_path):
-		subprocess.run(["touch", config_path])
-		with open(config_path, "w") as f:
+	if not os.path.exists(utils.CONFIG_PATH):
+		subprocess.run(["touch", utils.CONFIG_PATH])
+		with open(utils.CONFIG_PATH, "w") as f:
 			f.write(json.dumps({"def":"default", "profiles":{}}, indent=4))
 
-	with open(config_path, "r") as f:
+	with open(utils.CONFIG_PATH, "r") as f:
 		configuration = json.loads(f.read())
 	
 	profile = configuration["profiles"][name] = {}
@@ -43,7 +44,7 @@ def write_conf_profile(name, token, from_chat_id="", to_chat_id="", disable_web_
 	profile["allow_sending_without_reply"] = allow_sending_without_reply
 	profile["parse_mode"] = parse_mode
 
-	with open(config_path, "w") as f:
+	with open(utils.CONFIG_PATH, "w") as f:
 		f.write(json.dumps(configuration, indent=4))
 
 def edit_conf_profile(name, token="", from_chat_id="", to_chat_id="", disable_web_page_preview="", disable_notification="", protect_content="", allow_sending_without_reply="", parse_mode=""): 
@@ -60,11 +61,11 @@ def edit_conf_profile(name, token="", from_chat_id="", to_chat_id="", disable_we
 	- allow_sending_without_reply : bool (optional) -> Pass True if the message should be sent even if the specified replied-to message is not found
 	- parse_mode : str (optional) -> Mode for parsing entities in the message text. See the site for more details.'''
 
-	if token != "" and not requests.post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
+	if token != "" and not utils.requests_post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
 
-	if not os.path.exists(config_path): utils.ntf_exc("NOTIFY_EXCEPTION: Configuration file not found.")
+	if not os.path.exists(utils.CONFIG_PATH): utils.ntf_exc("NOTIFY_EXCEPTION: Configuration file not found.")
 
-	with open(config_path, "r") as f:
+	with open(utils.CONFIG_PATH, "r") as f:
 		configuration = json.loads(f.read())
 	
 	if name not in configuration["profiles"]: utils.ntf_exc("NOTIFY_EXCEPTION: The specified name was not in the list of profiles in the configuration file.")
@@ -79,7 +80,7 @@ def edit_conf_profile(name, token="", from_chat_id="", to_chat_id="", disable_we
 	if allow_sending_without_reply != "": profile["allow_sending_without_reply"] = allow_sending_without_reply
 	if parse_mode != "": profile["parse_mode"] = parse_mode
 
-	with open(config_path, "w") as f:
+	with open(utils.CONFIG_PATH, "w") as f:
 		f.write(json.dumps(configuration, indent=4))
 
 def write_conf_profile_from_dict(name, profile): 
@@ -99,14 +100,14 @@ def write_conf_profile_from_dict(name, profile):
 	'''
 
 	if "token" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing 'token' in the profile.")
-	if not requests.post(f"https://api.telegram.org/bot{profile['token']}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
+	if not utils.requests_post(f"https://api.telegram.org/bot{profile['token']}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
 
-	if not os.path.exists(config_path):
-		subprocess.run(["touch", config_path])
-		with open(config_path, "w") as f:
+	if not os.path.exists(utils.CONFIG_PATH):
+		subprocess.run(["touch", utils.CONFIG_PATH])
+		with open(utils.CONFIG_PATH, "w") as f:
 			f.write({"def":"default", "profiles":{}})
 	
-	with open(config_path, "r") as f:
+	with open(utils.CONFIG_PATH, "r") as f:
 		configuration = json.loads(f.read())
 
 	if "from_chat_id" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing 'from_chat_id' in the profile.")
@@ -119,7 +120,7 @@ def write_conf_profile_from_dict(name, profile):
 
 	configuration["profiles"][name] = profile
 
-	with open(config_path, "w") as f:
+	with open(utils.CONFIG_PATH, "w") as f:
 		f.write(json.dumps(configuration, indent=4))
 
 def set_default_profile(name):
@@ -128,7 +129,7 @@ def set_default_profile(name):
 	
 	- name : str -> name of the profile to set as default'''
 
-	with open(config_path, "r") as f:
+	with open(utils.CONFIG_PATH, "r") as f:
 		configuration = json.loads(f.read())
 
 	if name not in configuration["profiles"]:
@@ -136,7 +137,7 @@ def set_default_profile(name):
 	
 	configuration["def"] = name
 
-	with open(config_path, "w") as f:
+	with open(utils.CONFIG_PATH, "w") as f:
 		f.write(json.dumps(configuration, indent=4))
 
 def remove_profile(name): 
@@ -145,7 +146,7 @@ def remove_profile(name):
 	
 	- name : str -> name of the profile to remove. If the profile isn't found, nothing happens'''
 
-	with open(config_path, "r") as f:
+	with open(utils.CONFIG_PATH, "r") as f:
 		configuration = json.loads(f.read())
 
 	if name in configuration["profiles"]:
@@ -153,14 +154,14 @@ def remove_profile(name):
 	else:
 		return
 
-	with open(config_path, "w") as f:
+	with open(utils.CONFIG_PATH, "w") as f:
 		f.write(json.dumps(configuration, indent=4))
 
 def get_profiles(): 
 
 	'''Method to get the dict of the profiles saved in the configuration file'''
 
-	with open(config_path, "r") as f:
+	with open(utils.CONFIG_PATH, "r") as f:
 		return json.loads(f.read())["profiles"]
 
 #endregion
@@ -230,7 +231,7 @@ class bot:
 		- protect_content : bool (optional) -> Protects the contents of the sent message from forwarding and saving
 		- allow_sending_without_reply : bool (optional) -> Pass True if the message should be sent even if the specified replied-to message is not found'''
 
-		if token != "" and not requests.post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
+		if token != "" and not utils.requests_post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
 
 		if token != "":
 			self.__profile["token"] = token
@@ -266,7 +267,7 @@ class bot:
 
 		if "token" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing field 'token' in the profile.")
 		if profile["token"]=="": utils.ntf_exc("NOTIFY_EXCEPTION: Missing token in the profile.")
-		if not requests.post(f"https://api.telegram.org/bot{profile['token']}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
+		if not utils.requests_post(f"https://api.telegram.org/bot{profile['token']}/getMe").json()["ok"]: utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.")
 
 		if "from_chat_id" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing 'from_chat_id' in the profile.")
 		if "to_chat_id" not in profile: utils.ntf_exc("NOTIFY_EXCEPTION: Missing 'to_chat_id' in the profile.")
@@ -294,7 +295,7 @@ class bot:
 		- token : str (limited) -> The token to use. Either the token or the name must be specified. If both are specified, the token will overrite the one in the profile.
 		- name : str (limited) -> Unique name of the profile to use. Either the token or the name must be specified.'''
 
-		with open(config_path, "r") as f:
+		with open(utils.CONFIG_PATH, "r") as f:
 			configuration = json.loads(f.read())["profiles"]
 
 		if token == "" and name == "":
@@ -307,16 +308,16 @@ class bot:
 			if "token" not in configuration[name]:
 				utils.ntf_exc("NOTIFY_EXCEPTION: Configuration file corrupted.")
 			self.set_profile_from_dict(profile=configuration[name]) #---/valid
-			if not requests.post(f"https://api.telegram.org/bot{self.__profile['token']}/getMe").json()["ok"]:
+			if not utils.requests_post(f"https://api.telegram.org/bot{self.__profile['token']}/getMe").json()["ok"]:
 				utils.ntf_warn(f"the token inside the profile {name} is invalid, profile loaded anyways.\nConsider changing it or specify a new token.") #---/invalid
 
 		elif name == "":
-			if not requests.post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]:
+			if not utils.requests_post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]:
 				utils.ntf_exc("NOTIFY_EXCEPTION: Invalid token.") #invalid/---
 			self.__profile["token"] = token #valid/---
 		
 		elif name != "":
-			valid_token = requests.post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]
+			valid_token = utils.requests_post(f"https://api.telegram.org/bot{token}/getMe").json()["ok"]
 			if name not in configuration:
 				utils.ntf_warn(f"the name {name} of the profile to load isn't associated to any profile. Loading only the token specified.")
 				if not valid_token:
@@ -326,7 +327,7 @@ class bot:
 				if "token" not in configuration[name]:
 					utils.ntf_exc("NOTIFY_EXCEPTION: Configuration file corrupted.")
 				self.set_profile_from_dict(profile=configuration[name])
-				valid_profile = requests.post(f"https://api.telegram.org/bot{self.__profile['token']}/getMe").json()["ok"]
+				valid_profile = utils.requests_post(f"https://api.telegram.org/bot{self.__profile['token']}/getMe").json()["ok"]
 				if not valid_token:
 					if not valid_profile:
 						utils.ntf_exc("NOTIFY_EXCEPTION: Both tokens (the one specified and the one in the profile) are invalid.") #invalid/invalid
@@ -1010,6 +1011,6 @@ class bot:
 
 		url = self.__def_url + "/" + command
 
-		return requests.post(url, data=data, files=files)
+		return utils.requests_post(url, data=data, files=files)
 	
 	#endregion

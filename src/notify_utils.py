@@ -1,17 +1,26 @@
-import os, platform, sys, json
+import sys
+sys.dont_write_bytecode = True
+
+import os, platform, requests
 
 #---------------------------------------------------------------
 #region                       PATHS                            
 #---------------------------------------------------------------
 
 HOME = os.path.expanduser("~")
-CONFIG_PATH = f"{HOME}/.zanz_notify_profiles"#f"{HOME}/.notify2_profiles"
+CONFIG_PATH = f"{HOME}/.notify2_profiles"
+OLD_CONFIG_PATHS = [f"{HOME}/.zanz_notify_profiles", f"{HOME}/.zanz_notify_config"]
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 DEST_PATH = f"{HOME}/.notify2"
+OLD_DEST_PATH = f"{HOME}/.notify_zanz"
 
 OS = platform.system()
-SHELL_RC_FILE = f"{HOME}/.zshrc"
+ZSHRC_FILE = f"{HOME}/.zshrc"
+BASHRC_FILE = f"{HOME}/.bashrc"
 PYTHON_VERSION = "/usr/bin/python3"
+
+RELEASES = "https://www.zanzi.dev/Archive/notify/releases"
+RELEASES_LIST = "releases.json"
 
 #endregion
 
@@ -20,15 +29,15 @@ PYTHON_VERSION = "/usr/bin/python3"
 #region                     CONSTANTS                          
 #---------------------------------------------------------------
 ALIAS = "notify"
-VERSION = "1.0.0"
+VERSION = "0.0.0"
 
 SHELL_RC_EDIT = f"""
-
 #notify2
-alias {ALIAS} = '{PYTHON_VERSION} {DEST_PATH}/notify2_cmd.py'
-export PYTHONPATH = '{DEST_PATH}/python_module'
-
+alias {ALIAS}='{PYTHON_VERSION} {DEST_PATH}/app.py'
+export PYTHONPATH='{DEST_PATH}/python_module'
 """
+
+OLD_SHELL_RC_EDIT = "#notify - zanzi\nalias notify='python3 $HOME/.notify_zanz/notify_app.py'\nexport PYTHONPATH=$HOME/.notify_zanz/python_module"
 
 HELP_START = "\nHi! Thanks for using notify2!\n\nIf this instructions are not helping, please open an issue on github or give a look to the telegram API website (linked at the end of this message).\n\nHere's the """
 HELP_END = f"""
@@ -40,6 +49,8 @@ Telegram API explanation: \033[4mhttps://core.telegram.org/bots/api\033[0m
 
 Version: {VERSION}
 """
+
+CONNECTION_ISSUE = "There might be a connection issue, retry later."
 #endregion
 
 
@@ -79,12 +90,12 @@ def ntf_warn(msg : str, loc : str = "", line : int = "", sugg : str = ""):
     if loc != "": print(f"{WARN_MSG}Origin: {loc}:{line}")
     if sugg != "": ntf_info(sugg)
 
-def ntf_input(msg : str, options : list[str]) -> str:
+def ntf_input(msg : str, options : list[str] = []) -> str:
 
     if len(msg.splitlines()) > 1: ntf_warn("Input message should contain only one line for readability.")
 
-    choice = input(f"{INPUT_MSG}{msg} {str(options).replace(',', ' |')}: ")
-    while choice not in options:
+    choice = input(f"{INPUT_MSG}{msg} {str(options).replace(',', ' |') if len(options) > 0  else ''}: ")
+    while len(options) > 0 and choice not in options:
         ntf_warn("Command not recognised.")
         choice = input(f"{INPUT_MSG}{msg} {str(options).replace(',', ' |')}: ")
 
@@ -97,6 +108,15 @@ def ntf_exc(msg : str, loc : str = "", line : int = "") -> None:
 
 
 #endregion
+
+
+	
+def requests_post(url, data={}, files=None):
+
+	try:
+		return requests.post(url, data=data, files=files)
+	except Exception as e:
+		ntf_error(CONNECTION_ISSUE)
 
 
 #---------------------------------------------------------------
@@ -343,39 +363,3 @@ EXPLANATION = {
 }
 
 #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def main():
-    
-    #ntf_info("Prova di un messaggio di info\nQuesta è una seconda riga...")
-    #ntf_input("Inserisci una parola e me la dimenticherò")
-    #ntf_warn("Prova di un warning\nQuesta è una seconda riga...", loc=__file__, line=sys._getframe().f_lineno)
-    #ntf_error("Prova di un errore\nQuesta è una seconda riga...", loc=__file__, line=sys._getframe().f_lineno)
-
-    parser = arg_parser()
-    
-    parser.add_param()
-
-    parsed = parser.parse(sys.argv)
-    print(json.dumps(parsed, indent=4))
-            
-    print(OS)
-
-if __name__ == "__main__":
-    main()
