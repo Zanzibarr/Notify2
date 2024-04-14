@@ -117,6 +117,8 @@ def __update(parsed : list[dict]):
     subprocess.run(shlex.split(f"unzip {BASE_PATH}/ntfdwntmp/{asked_version} -d {BASE_PATH}/ntfdwntmp/"), stdout=subprocess.DEVNULL)
     subprocess.run(shlex.split(f"rm {BASE_PATH}/ntfdwntmp/{asked_version}"))
     subprocess.run(shlex.split(f"{PYTHON_VERSION} {BASE_PATH}/ntfdwntmp/setup.py -u"))
+
+    subprocess.run(shlex.split(f"rm -r {BASE_PATH}/ntfdwntmp/*"))
         
     ntf_info("notify2 has been updated")
 
