@@ -11,7 +11,7 @@ try:
 
     isupdate = len(sys.argv) == 2 and sys.argv[1] == "-u"
 
-    if not isupdate: ntf_info("\nThanks for downloading notify2!\n\nBase repo: https://github.com/Zanzibarr/Notify2\nScript made by @Zanzibarr.\nBeginning setup...\n")
+    if not isupdate: ntf_info("\nThanks for downloading notify2!\n\nBase repo: https://github.com/Zanzibarr/Notify2\nBeginning setup...\n")
 
     if HOME == "/var/root":
         ntf_error("Please run the setup in user mode.")
