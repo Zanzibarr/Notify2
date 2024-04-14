@@ -93,14 +93,19 @@ def __update(parsed : list[dict]):
             ntf_info("Exiting.")
             exit(0)
 
-    ntf_info(f"Downloading version {versions[asked_version]['version']}.")
+    new_version = versions[asked_version]['version']
+    if VERSION == new_version:
+        ntf_info(f"Already to version {VERSION}.")
+        exit(0)
+
+    ntf_info(f"Downloading version {new_version}.")
     choice = ntf_input("Proceed?", ["y", "n"])
 
     if choice == "n":
         ntf_warn("notify not updated.", sugg="Exiting.")
         exit(0)
 
-    asked_version = f"v{versions[asked_version]['version']}.zip"
+    asked_version = f"v{new_version}.zip"
 
     if not os.path.exists(f"{BASE_PATH}/ntfdwntmp"):
         os.mkdir(f"{BASE_PATH}/ntfdwntmp")

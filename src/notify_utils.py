@@ -29,7 +29,7 @@ RELEASES_LIST = "releases.json"
 #region                     CONSTANTS                          
 #---------------------------------------------------------------
 ALIAS = "notify"
-VERSION = "0.0.0"
+VERSION = "1.0.0"
 
 SHELL_RC_EDIT = f"""
 #notify2
