@@ -3,7 +3,7 @@ sys.dont_write_bytecode = True
 
 import time, subprocess, os, json
 import numpy as np
-sys.path.append('../')
+sys.path.append(f'{os.path.dirname(__file__)}/../')
 import notify_utils as utils
 
 #---------------------------------------------------------------
