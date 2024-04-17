@@ -2,7 +2,7 @@
 
 This python application will send messages through telegram to any chat you wish.  
 
-Current version: 1.0.0  
+Current version: 1.0.1  
 
 Feel free to suggest us new improvements or to report any bug/problem by opening an [issue](https://github.com/Zanzibarr/Notify2/issues).
 
