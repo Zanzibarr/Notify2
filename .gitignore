@@ -2,3 +2,5 @@ local/
 __pycache__/
 python_module/__pycache__
 .DS_Store
+notify3/target/
+notify3/Cargo.lock
