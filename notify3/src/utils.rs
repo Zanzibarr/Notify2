@@ -7,8 +7,9 @@ use std::{io::{self, Write}, process::exit};
 #[tokio::main]
 pub async fn reqget<T:std::fmt::Display>(url : T) -> Result<Option<reqwest::StatusCode>, reqwest::Error> {
 
-    let client = reqwest::Client::new();
-    let response = client.get(format!("{url}")).send().await?;
+    let response = reqwest::Client::new()
+        .get(format!("{url}"))
+        .send().await?;
     let status_code = response.status();
     Ok(Some(status_code))
 
@@ -17,8 +18,9 @@ pub async fn reqget<T:std::fmt::Display>(url : T) -> Result<Option<reqwest::Stat
 #[tokio::main]
 pub async fn reqpost<T:std::fmt::Display>(url: T) -> Result<Option<reqwest::StatusCode>, reqwest::Error> {
 
-    let client = reqwest::Client::new();
-    let response = client.post(format!("{url}")).send().await?;
+    let response = reqwest::Client::new()
+        .post(format!("{url}"))
+        .send().await?;
     todo!("Finish: see notify.py __request_format");
     let status_code = response.status();
     Ok(Some(status_code))
