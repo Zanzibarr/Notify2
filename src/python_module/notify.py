@@ -364,6 +364,8 @@ class bot:
 		return self.send_message_by_text(message, chat_id=chat_id, disable_notification=False, parse_mode="Markdown")
 
 	#TODO: Be able to set the number of shown steps
+ 	#	-> minutes and hours
+ 	#	-> view edits on the server version
 	def create_progress_bar(self, steps, title="", text="", chat_id=""):
 
 		'''Creates and send the initial progress bar (works only on for loops with a known number of steps)
@@ -393,6 +395,8 @@ class bot:
 		return r
 
 	#TODO: Update progess bar considering showing steps
+ 	#	-> minutes and hours
+ 	#	-> view edits on the server version
 	def update_progress_bar(self): 
 
 		'''Updates of 1 step the progress bar (works only on for loops with a known number of steps)'''
@@ -415,6 +419,8 @@ class bot:
 
 		return r
 
+ 	#TODO: minutes and hours
+ 	#	-> view edits on the server version
 	def conclude_progress_bar(self): 
 
 		'''Concludes a progress bar (use it after the end of the for loop)'''
