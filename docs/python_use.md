@@ -51,7 +51,7 @@ bot = notify.bot(token="your_token")
 ```python
 bot = notify.bot(profile="profile_name")
 ```
-The profile you choose must be saved inside the ~/.zanz_notify_profiles configuration file.  
+The profile you choose must be saved inside the ~/.notify2_profiles configuration file.  
 See [how to setup a profile through python](#setup-a-new-profile).  
 
 If you specify both a token and a profile, first the specified profile will be loaded, then the token specified will take precedence over the token in the profile.  
