@@ -77,13 +77,13 @@ Once the installation has finished you can delete the installer.
 ## Update
 To get the latest version of notify:
 ```shell
-> notify -update
+notify -update
 ```
 
 ## Uninstall
 To uninstall just run the command
 ```shell
-> notify -uninstall
+notify -uninstall
 ```
 Uninstalling notify won't remove the configuration file located at
 ```shell
@@ -91,5 +91,5 @@ $HOME/.notify2_profiles
 ```
 To remove those too just write
 ```shell
-> rm $HOME/.notify2_profiles
+rm $HOME/.notify2_profiles
 ```
