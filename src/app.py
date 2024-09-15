@@ -1,6 +1,5 @@
 import sys
 sys.dont_write_bytecode = True
-#Ciao zanzi
 import python_module.notify as notify
 from notify_utils import *
 import subprocess, shlex, requests, json

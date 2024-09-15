@@ -51,6 +51,10 @@ bot = notify.bot(token="your_token")
 ```python
 bot = notify.bot(profile="profile_name")
 ```
+- through the default profile (specified in the ~/.notify2_profiles configuration file)
+```python
+bot = notify.bot()
+```
 The profile you choose must be saved inside the ~/.notify2_profiles configuration file.  
 See [how to setup a profile through python](#setup-a-new-profile).  
 
