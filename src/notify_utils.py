@@ -157,9 +157,9 @@ def requests_post(url, data={}, files=None):
 
 def format_time(time):
 
-    hours = int(np.floor(time / 3600))
-    minutes = int(np.floor((time - hours * 60)/60))
-    seconds = int(np.floor(time - hours * 3600 - minutes * 60))
+    hours = int(time // 3600)
+    minutes = int((time % 3600) // 60)
+    seconds = int(time % 60)
 
     return f'{f"{hours}h " if hours >= 1 else ""}{f"{minutes}m " if minutes >= 1 else ""}{seconds if seconds >= 1 else ""}s'
 
